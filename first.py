@@ -1,36 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-n = np.arange(-10, 11, 1)
-unit_step = np.where(n >= 0, 1, 0)
-ramp = np.where(n >= 0, n, 0)
-a = 1.1
-expo = a ** n
-f = 0.1
-sine = np.sin(2 * np.pi * f * n)
-cosine = np.cos(2 * np.pi * f * n)
+# Original continuous-time signal: x(t) = 3cos(100πt) → f = 50 Hz
+f = 50       # Analog signal frequency in Hz
+A = 3        # Amplitude
 
-plt.figure(figsize=(12, 8))
+# Time duration to visualize (0 to 0.05 sec → one or more cycles)
+t = np.linspace(0, 0.05, 1000)
+x_t = A * np.cos(2 * np.pi * f * t)
 
-plt.subplot(3, 2, 1)
-plt.stem(n, unit_step)
-plt.title("Unit Step Function")
+# Two sampling rates
+fs1 = 200  # Hz → Good (above Nyquist: 2*f = 100 Hz)
+fs2 = 75   # Hz → Below Nyquist → Aliasing expected
 
-plt.subplot(3, 2, 2)
-plt.stem(n, ramp)
-plt.title("Ramp Function")
+# Sampling periods
+T1 = 1 / fs1
+T2 = 1 / fs2
 
-plt.subplot(3, 2, 3)
-plt.stem(n, expo)
-plt.title(f"Exponential Function (a={a})")
+# Sampling time vectors
+n1 = np.arange(0, 0.05, T1)
+n2 = np.arange(0, 0.05, T2)
 
-plt.subplot(3, 2, 4)
-plt.stem(n, sine)
-plt.title(f"Sine Function (f={f})")
+# Discrete-time signals (samples)
+x_n1 = A * np.cos(2 * np.pi * f * n1)
+x_n2 = A * np.cos(2 * np.pi * f * n2)
 
-plt.subplot(3, 2, 5)
-plt.stem(n, cosine)
-plt.title(f"Cosine Function (f={f})")
+# Plotting
+plt.figure(figsize=(10, 6))
 
+# Continuous signal
+plt.plot(t, x_t, 'k-', label='x(t) = 3cos(100πt)', linewidth=1)
+
+# Sampled at 200 Hz
+plt.stem(n1, x_n1, linefmt='r-', markerfmt='ro', basefmt=' ', label='Sampled at 200 Hz')
+
+# Sampled at 75 Hz
+plt.stem(n2, x_n2, linefmt='b-', markerfmt='bo', basefmt=' ', label='Sampled at 75 Hz')
+
+plt.title('Sampling of x(t) = 3cos(100πt) at 200 Hz and 75 Hz')
+plt.xlabel('Time (sec)')
+plt.ylabel('Amplitude')
+plt.legend()
+plt.grid(True)
 plt.tight_layout()
 plt.show()

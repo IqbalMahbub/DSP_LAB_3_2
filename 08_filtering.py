@@ -1,40 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Example input signal
-x = np.array([1, 3, 4, 6, 7, 8, 10, 12, 11, 9, 8, 7, 5, 3, 2])
+# Random signal with noise
+np.random.seed(0)
+t = np.linspace(0, 1, 200)
+x = np.sin(2 * np.pi * 5 * t) + 0.5 * np.random.randn(len(t))
 
-x_pad=np.concatenate((np.zeros(6),x))
+# 6-point Averaging Filter
+def avg(y):
+    y_avg = np.zeros_like(y, dtype=float)
+    for n in range(5, len(y)):
+        y_avg[n] = np.sum(y[n-5:n+1]) / 6
+    return y_avg
 
-y_avg=np.zeros(len(x))
-y_diff= np.zeros(len(x))
+# 6-point Differencing Filter
+def diff(y):
+    y_diff = np.zeros_like(y, dtype=float)
+    for n in range(len(y)):
+        if n >= 5:
+            y_diff[n] = (y[n] - y[n-1] + y[n-2] - y[n-3] + y[n-4] - y[n-5]) / 6
+    return y_diff
 
-for n in range(5,len(x)):
-    y_avg[n]=(1/6)*np.sum(x[n-5:n+1])
+# Apply filters
+y_avg = avg(x)
+y_diff = diff(x)
 
-for n in range(len(x)):
-    if n>=6:
-        y_diff[n]=x[n]-x[n-6]
-    else:
-        y_diff[n]=0
+# Plotting
+plt.figure(figsize=(10, 8))
 
-plt.figure(figsize=(10,8))
-
-plt.subplot(3,1,1)
-plt.stem(x)
-plt.title('Oriinal signal')
+plt.subplot(3, 1, 1)
+plt.plot(t, x, label='Original', color='gray')
+plt.title('Original Signal')
 plt.grid(True)
 
-
-
-plt.subplot(3,1,2)
-plt.stem(y_avg)
-plt.title('avaraging filter')
+plt.subplot(3, 1, 2)
+plt.plot(t, y_avg, label='Averaging Filter', color='green')
+plt.title('6-Point Averaging Filter Output')
 plt.grid(True)
 
-plt.subplot(3,1,3)
-plt.stem(y_diff)
-plt.title('Diffanrce filter')
+plt.subplot(3, 1, 3)
+plt.plot(t, y_diff, label='Differencing Filter', color='red')
+plt.title('6-Point Differencing Filter Output')
 plt.grid(True)
 
 plt.tight_layout()

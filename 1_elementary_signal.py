@@ -18,7 +18,7 @@ plt.title("Ramp signal")
 
 #exponential
 a=1.1
-expo=a**n
+expo=a*n
 plt.subplot(3,2,3)
 plt.stem(n,expo)
 plt.title("Exponential")
